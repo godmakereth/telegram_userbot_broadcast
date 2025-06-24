@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.pyc
+
+# VSCode
+.vscode/
+
+# 環境設定
+.env
+
+# Telegram session
+userbot.session 
