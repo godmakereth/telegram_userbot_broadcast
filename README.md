@@ -1,68 +1,72 @@
-# Telegram 廣播機器人
+# Telegram 廣播機器人 (含自動備份)
 
-一個基於 Python + Telethon 的多群組/頻道自動廣播機器人，支援多時段排程、目標管理、文案管理、完整指令與日誌，適合自動推播訊息到多個 Telegram 群組/頻道。
+本專案是一套基於 Python 的 Telegram 使用者機器人，支援多群組/頻道廣播、定時排程、管理員權限、文案管理、自動本地備份等功能，適合社群經營、公告推播、行銷等多種用途。
 
-## 功能特色
+---
 
-- 多群組/頻道自動廣播
-- 多時段排程
-- 文案檔案管理、預覽、測試
+## 主要功能
+- 支援多群組/頻道自動廣播
+- 多時段定時排程
 - 管理員權限控管
-- 詳細日誌記錄
-- 設定自動保存，重啟自動恢復
-- 完整 Telegram 指令操作
+- 文案多檔管理、預覽、測試
+- 廣播歷史查詢、狀態查詢
+- 本地自動備份所有設定檔
+- 完整指令操作說明，適合新手
 
-## 安裝與環境需求
+---
 
-- Python 3.8+
-- pip
-
-### 安裝依賴
-
-```bash
-pip install -r requirements.txt
-```
-
-## 快速開始
-
-1. **申請 Telegram API ID & HASH**  
-   前往 [my.telegram.org](https://my.telegram.org) 申請。
-
-2. **建立 `.env` 檔案**  
-   在專案根目錄建立 `.env`，內容範例：
-   ```
-   API_ID=你的API_ID
-   API_HASH=你的API_HASH
-   PHONE_NUMBER=你的手機號碼（含國碼）
-   PASSWORD=（如有雙重驗證則填，否則留空）
-   CONTROL_GROUP=控制群組ID（可選）
-   TIMEZONE=Asia/Taipei
-   ADMIN_USERS=123456789,987654321
-   ```
-
-3. **啟動機器人**
+## 安裝與啟動
+1. 下載或 clone 專案：
    ```bash
-   python main.py
+   git clone https://github.com/godmakereth/RG_Tai_Telegram_User_bot.git
+   cd RG_Tai_Telegram_User_bot
    ```
-   或執行 `start.bat`（Windows）
+2. 安裝依賴：
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. 複製 `.env.example` 為 `.env`，填入 Telegram API 資訊。
+4. 執行 `start.bat` 或 `python main.py` 啟動機器人。
+5. 首次啟動會要求登入 Telegram 帳號，依指示完成。
+
+---
 
 ## 常用指令
+- `/add`：將當前群組加入廣播清單
+- `/add_by_id <ID>`：透過 ID 加入群組
+- `/list`：查看所有廣播群組
+- `/remove <編號>`：移除指定群組
+- `/my_groups`：快速查看所在群組
+- `/time HH:MM`：新增每日廣播時間
+- `/time remove HH:MM`：移除指定時間
+- `/time clear`：清除所有時間
+- `/enable` / `/disable`：啟用/停用排程
+- `/files`：列出所有文案檔
+- `/preview [檔名]`：預覽文案內容
+- `/test [檔名]`：測試廣播
+- `/status`：查看機器人狀態
+- `/history`：查詢廣播歷史
+- `/help`：顯示所有指令說明
 
-| 指令 | 說明 |
-|------|------|
-| `/add` 或 `/add <群組ID>` | 新增目前群組或指定ID為廣播目標 |
-| `/list` | 查看所有已加入群組/頻道，標記廣播目標 |
-| `/remove <編號>` | 移除目標群組 |
-| `/add_time HH:MM` | 新增廣播時間 |
-| `/remove_time HH:MM` | 移除廣播時間 |
-| `/list_times` | 查看所有排程時間 |
-| `/enable` / `/disable` | 啟用/停用自動廣播 |
-| `/files` | 列出所有文案檔案 |
-| `/preview [檔名]` | 預覽文案內容 |
-| `/test [檔名]` | 測試廣播 |
-| `/status` | 查看機器人狀態 |
-| `/history` | 查看廣播歷史 |
-| `/help` | 查看所有指令說明 |
+> 更多完整指令與說明，請參考 `完整指令操作說明.txt`。
+
+---
+
+## 自動備份說明
+- 機器人啟動時與每日自動將 `settings.json`、`admins.json`、`broadcast_config.json`、`broadcast_history.json` 備份到 `backup/` 資料夾，檔名加上時間戳記。
+- 請定期備份 `backup/` 內容，必要時可用於還原設定。
+
+---
+
+## 注意事項
+- 請勿上傳 `.env`、`userbot.session`、`__pycache__`、`backup/*.bak` 等敏感或暫存檔案。
+- 管理員指令僅限授權帳號使用，請妥善保管管理員名單。
+- 所有設定皆自動保存，重啟後自動恢復。
+
+---
+
+## 授權
+本專案採用 MIT License，歡迎自由使用與二次開發。
 
 ## 檔案結構說明
 
@@ -82,8 +86,4 @@ rg_thelegram_user_bot/
 ├── broadcast_history.json   # 廣播歷史
 ├── message 1.txt            # 文案檔案
 ├── ...（其他檔案）
-```
-
-## 授權
-
-MIT License 
+``` 
