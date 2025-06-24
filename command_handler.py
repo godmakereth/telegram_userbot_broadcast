@@ -64,7 +64,7 @@ class CommandHandler:
                     await event.reply(f"✅ 已新增廣播目標: 「{chat_info['title']}」")
                 else:
                     await event.reply(f"ℹ️ 「{chat_info['title']}」已在目標中。")
-        self.client.add_event_handler(self.list_groups, events.NewMessage(pattern=r'^/list_group$', func=self._is_admin))
+        self.client.add_event_handler(self.list_groups, events.NewMessage(pattern=r'^/list_groups$', func=self._is_admin))
         self.client.add_event_handler(self.remove_group, events.NewMessage(pattern=r'/remove (\d+)', func=self._is_admin))
         self.client.add_event_handler(self.my_groups, events.NewMessage(pattern='/my_groups', func=self._is_admin))
         self.client.add_event_handler(self.add_by_id, events.NewMessage(pattern=r'/add_by_id (-?\d+)', func=self._is_admin))
@@ -218,6 +218,22 @@ class CommandHandler:
     async def list_groups(self, event):
         if not self.config.target_groups:
             await event.reply("📋 無廣播目標。"); return
+            
+        # 嘗試更新群組名稱
+        updated = False
+        for group in self.config.target_groups:
+            if group['title'].startswith('頻道/群組 ') or group['title'].startswith('ID '):
+                try:
+                    entity = await self.client.get_entity(group['id'])
+                    if hasattr(entity, 'title'):
+                        group['title'] = entity.title
+                        updated = True
+                except Exception as e:
+                    print(f"無法更新群組 {group['id']} 的名稱: {e}")
+        
+        if updated:
+            self.config.save_settings()
+            
         message = "📋 廣播目標列表:\n\n" + "\n".join([
             f"{i}. {g['title']}\n   ID: `{g['id']}`\n" for i, g in enumerate(self.config.target_groups, 1)
         ])
@@ -321,7 +337,7 @@ class CommandHandler:
 
 **🏢 廣播目標**
 - `/add`: 新增目前群組
-- `/list`: 查看目標列表
+- `/list_groups`: 查看目標列表
 - `/remove <編號>`: 移除目標
 
 **📝 文案與測試**

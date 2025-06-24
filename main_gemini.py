@@ -367,7 +367,7 @@ class JobBroadcaster:
             else:
                 await event.reply(f"ℹ️ 「{chat_info['title']}」已在清單中。")
 
-        @self.client.on(events.NewMessage(pattern='/list', from_users=self.admin_users))
+        @self.client.on(events.NewMessage(pattern='/list_groups', from_users=self.admin_users))
         async def list_groups(event):
             if not self.target_groups:
                 await event.reply("📋 廣播清單為空。")
@@ -460,7 +460,7 @@ class JobBroadcaster:
 **🏢 群組管理**
 - `/add` - 將當前群組加入清單
 - `/add_by_id <ID>` - 透過ID添加
-- `/list` - 查看廣播群組清單
+- `/list_groups` - 查看廣播群組清單
 - `/remove <編號>` - 移除指定群組
 
 **📝 文案與測試**
