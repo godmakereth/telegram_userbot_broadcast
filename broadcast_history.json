@@ -42,5 +42,32 @@
     "success_rate": "100.0%",
     "scheduled": true,
     "restart_count": 29
+  },
+  {
+    "time": "2025-06-24 14:40:00",
+    "success_count": 4,
+    "total_count": 4,
+    "message_file": "message 3.txt",
+    "success_rate": "100.0%",
+    "scheduled": true,
+    "restart_count": 31
+  },
+  {
+    "time": "2025-06-24 14:46:00",
+    "success_count": 4,
+    "total_count": 4,
+    "message_file": "message 3.txt",
+    "success_rate": "100.0%",
+    "scheduled": true,
+    "restart_count": 31
+  },
+  {
+    "time": "2025-06-24 14:50:00",
+    "success_count": 5,
+    "total_count": 5,
+    "message_file": "message 3.txt",
+    "success_rate": "100.0%",
+    "scheduled": true,
+    "restart_count": 31
   }
 ]

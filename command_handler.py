@@ -20,7 +20,7 @@ class CommandHandler:
 
     def register_handlers(self):
         # --- 管理員與群組成員管理 ---
-        self.client.add_event_handler(self.list_admins, events.NewMessage(pattern='/list_admins', func=self._is_admin))
+        self.client.add_event_handler(self.list_admins, events.NewMessage(pattern=r'^/list_admins$', func=self._is_admin))
         self.client.add_event_handler(self.add_admin, events.NewMessage(pattern=r'/add_admin (.+)', func=self._is_admin))
         self.client.add_event_handler(self.remove_admin, events.NewMessage(pattern=r'/remove_admin (.+)', func=self._is_admin))
         self.client.add_event_handler(self.list_members, events.NewMessage(pattern='/list_members', func=self._is_admin))
@@ -64,7 +64,7 @@ class CommandHandler:
                     await event.reply(f"✅ 已新增廣播目標: 「{chat_info['title']}」")
                 else:
                     await event.reply(f"ℹ️ 「{chat_info['title']}」已在目標中。")
-        self.client.add_event_handler(self.list_groups, events.NewMessage(pattern='/list', func=self._is_admin))
+        self.client.add_event_handler(self.list_groups, events.NewMessage(pattern=r'^/list_group$', func=self._is_admin))
         self.client.add_event_handler(self.remove_group, events.NewMessage(pattern=r'/remove (\d+)', func=self._is_admin))
         self.client.add_event_handler(self.my_groups, events.NewMessage(pattern='/my_groups', func=self._is_admin))
         self.client.add_event_handler(self.add_by_id, events.NewMessage(pattern=r'/add_by_id (-?\d+)', func=self._is_admin))
@@ -150,11 +150,14 @@ class CommandHandler:
         except Exception as e: await event.reply(f"❌ 移除失敗: 無法找到用戶 '{identifier_raw}'.\n錯誤: {e}")
 
     async def list_admins(self, event):
-        if not self.config.admins: await event.reply("👑 目前沒有設定任何管理員。"); return
+        if not self.config.admins:
+            await event.reply("👑 目前沒有設定任何管理員。")
+            return
         message = "👑 **目前管理員列表:**\n\n"
         for i, admin in enumerate(self.config.admins, 1):
-            name = admin.get('name', 'N/A')
-            username_str = f"(@{admin.get('username')})" if admin.get('username') else ""
+            name = admin.get('name', '未知名稱')
+            username = admin.get('username')
+            username_str = f"(@{username})" if username else ""
             message += f"{i}. {name} {username_str}\n   ID: `{admin['id']}`\n"
         await event.reply(message)
 
@@ -213,8 +216,11 @@ class CommandHandler:
         await event.reply(msg)
 
     async def list_groups(self, event):
-        if not self.config.target_groups: await event.reply("📋 無廣播目標。"); return
-        message = "📋 **廣播目標列表:**\n\n" + "\n".join([f"{i}. {g['title']}\n   ID: `{g['id']}`\n" for i, g in enumerate(self.config.target_groups, 1)])
+        if not self.config.target_groups:
+            await event.reply("📋 無廣播目標。"); return
+        message = "📋 廣播目標列表:\n\n" + "\n".join([
+            f"{i}. {g['title']}\n   ID: `{g['id']}`\n" for i, g in enumerate(self.config.target_groups, 1)
+        ])
         await event.reply(message)
 
     async def remove_group(self, event):
