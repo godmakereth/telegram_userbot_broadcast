@@ -1,6 +1,8 @@
 import asyncio
 from datetime import datetime
 import logging
+import os
+import shutil
 
 from config import Config
 from telegram_client import TelegramClientManager
@@ -107,7 +109,25 @@ class JobBot:
         logging.info("✅ 機器人已準備就緒，正在等待指令...")
         await self.client.run_until_disconnected()
 
+def backup_files():
+    os.makedirs('backup', exist_ok=True)
+    now = datetime.now().strftime('%Y%m%d_%H%M%S')
+    for f in ['settings.json', 'admins.json', 'broadcast_config.json', 'broadcast_history.json']:
+        if os.path.exists(f):
+            shutil.copy(f, f'backup/{f}.{now}.bak')
+
 if __name__ == '__main__':
+    # 啟動時建立備份資料夾
+    os.makedirs('backup', exist_ok=True)
+    # 啟動時立即備份一次
+    backup_files()
+    # 啟動每日定時備份（可用 threading.Timer 或 schedule）
+    import threading
+    def daily_backup():
+        backup_files()
+        # 每24小時執行一次
+        threading.Timer(86400, daily_backup).start()
+    daily_backup()
     try:
         bot = JobBot()
         asyncio.run(bot.run())
