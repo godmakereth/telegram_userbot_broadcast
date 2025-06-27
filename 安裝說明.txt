@@ -1,82 +1,109 @@
-本次對話內容摘要
-====================
+## Telegram 廣播機器人 - 安裝說明
 
-1. 專案功能與問題排查
-   - 使用者有一個 Telegram 廣播機器人專案，遇到排程時間到但無法自動廣播的問題。
-   - 助理協助檢查 `main.py`、`broadcast_manager.py`、`scheduler.py`、`config.py` 等檔案，發現事件循環 (`loop`) 取得方式錯誤，導致排程觸發時 `loop_running=False`，廣播任務被取消。
-   - 協助修正 `main.py`，將事件循環取得方式改為 `asyncio.get_running_loop()`，並在 `run()` 方法中初始化相關模組，問題解決。
+本文件將引導您完成 Telegram 廣播機器人的安裝與首次啟動。
 
-2. 日誌與除錯
-   - 使用者希望終端機能看到完整指令與動作日誌。
-   - 助理協助在主要模組（`main.py`、`broadcast_manager.py`、`scheduler.py`、`command_handler.py`）加上 `print` 與 `logging` 雙重日誌，並指導如何設定 logging 格式。
+### 1. 環境準備
 
-3. 廣播目標與排程管理
-   - 使用者希望開機時自動偵測所有已加入的群組/頻道，並標記哪些已設定廣播，並能用指令查詢。
-   - 助理協助新增 `list_all_groups` 方法，開機時自動列印，並新增 `/list_groups` 指令（後來合併為 `/list`）。
-   - `/add` 指令修正為可直接 `/add <群組ID>`，並自動查詢名稱，避免手動輸入錯誤。
+*   **Python 3.8 或更高版本**：請確保您的系統已安裝 Python。
+    *   您可以從 [Python 官方網站](https://www.python.org/downloads/) 下載並安裝。
+*   **pip**：Python 的套件管理器，通常隨 Python 一起安裝。
 
-4. 指令優化與命名
-   - `/list` 指令合併為同時顯示所有已加入群組/頻道並標記廣播目標。
-   - `/list_admins` 指令修正為只顯示管理員名單，避免誤顯示廣播目標。
-   - `/list` 指令改名為 `/list_group`，語意更清楚。
+### 2. 下載專案
 
-5. GitHub 上傳與專案整理
-   - 協助使用者將專案上傳至 GitHub（`https://github.com/godmakereth/rg_thelegram_user_bot`），並指導如何建立 `.gitignore`、`.env.example`、README.md。
-   - 指導如何移除不必要的檔案（如 `command_handler 舊 .py`、`userbot.session-journal`）並避免敏感檔案上傳。
-   - 檢查 GitHub 倉庫與本地專案是否一致，確認同步無誤。
+您可以透過 Git Clone 或直接下載 ZIP 壓縮檔來獲取專案程式碼。
 
-6. README 與新手教學
-   - 協助撰寫詳細的 README.md，包含專案簡介、安裝步驟、設定說明、常用指令、檔案結構與授權。
-   - 根據使用者需求，提供給新手用戶的超詳細安裝與操作流程，讓完全不懂程式的人也能上手。
+```bash
+# 如果您已安裝 Git
+git clone https://github.com/godmakereth/RG_Tai_Telegram_User_bot.git
+cd RG_Tai_Telegram_User_bot
 
-7. 多帳號/多電腦部署
-   - 指導如何在另一台電腦架設專案並新增新的 user bot，包括 clone 專案、安裝依賴、建立新 `.env`、首次登入與初始設定。
+# 或者，直接下載 ZIP 檔並解壓縮到您希望的目錄
+```
 
-8. 專案 .json 檔案說明
-   - 詳細說明 `settings.json`、`admins.json`、`broadcast_config.json`、`broadcast_history.json` 的用途與範例內容。
+### 3. 安裝依賴套件
 
-9. 管理員與控制群組管理
-   - 說明如何用 `/add_admin <ID/@用戶名>` 或 `/sync_admins` 指令新增管理員，並用 `/list_admins` 查詢。
+進入專案根目錄後，開啟您的終端機（命令提示字元或 PowerShell），執行以下指令安裝所有必要的 Python 套件：
 
-10. 功能與指令總檢查
-    - 助理協助檢查所有指令與功能是否齊全、命名是否清楚，確認專案功能完整且易於維護。
+```bash
+pip install -r requirements.txt
+```
 
----
+### 4. 設定環境變數 (.env)
 
-續篇與補充
-====================
+1.  在專案根目錄下，找到 `example.env` 檔案，將其**複製**並**重新命名**為 `.env`。
+2.  使用文字編輯器（如記事本、VS Code）開啟 `.env` 檔案。
+3.  填入您的 Telegram API 資訊：
+    *   `API_ID`：從 [my.telegram.org](https://my.telegram.org/) 獲取您的 API ID。
+    *   `API_HASH`：從 [my.telegram.org](https://my.telegram.org/) 獲取您的 API Hash。
+    *   `PHONE_NUMBER`：您的 Telegram 帳號綁定的手機號碼，**包含國際區碼**（例如：`+886912345678`）。
+    *   `SESSION_NAME`：會話檔案的名稱，預設為 `userbot`。如果您運行多個機器人，請為每個機器人設定不同的名稱。
+    *   `CONTROL_GROUP`：**您的主控制群組 ID**。機器人將會監聽此群組的指令。請確保此 ID 是正確的負數 ID（例如：`-1001234567890`）。
+    *   `ADMIN_USERS`：您的 Telegram 用戶 ID，多個 ID 用逗號分隔。這些用戶將擁有機器人的管理權限。
+    *   `BROADCAST_DELAY`：每次廣播之間的時間間隔（秒），建議設定為 `5` 或更高，以避免觸發 Telegram 的頻率限制。
+    *   `TIMEZONE`：設定機器人運行的時區，例如 `Asia/Taipei`。
 
-11. 錯誤排查與即時支援
-    - 在遇到排程、指令無法觸發或訊息未正常發送時，助理協助逐步檢查 log、程式碼與設定檔，並提供 debug 建議（如加強 logging、檢查 event loop 狀態、逐步測試指令）。
-    - 指導如何利用 log 訊息快速定位問題來源，並建議常見的排錯步驟。
+    範例 `.env` 內容：
+    ```
+    API_ID=1234567
+    API_HASH=your_api_hash_here
+    PHONE_NUMBER=+886912345678
+    SESSION_NAME=my_telegram_bot
+    CONTROL_GROUP=-1001234567890
+    ADMIN_USERS=123456789,987654321
+    BROADCAST_DELAY=5
+    TIMEZONE=Asia/Taipei
+    ```
 
-12. 程式碼結構優化
-    - 協助將重複邏輯抽離成共用函式，提升程式碼可讀性與維護性。
-    - 建議模組分工（如將排程、廣播、指令處理分開），並說明各檔案職責，方便日後擴充。
+### 5. 準備廣播活動內容 (`content_databases/`)
 
-13. 安全性與權限管理
-    - 強調管理員權限的重要性，建議所有敏感操作（如新增/移除廣播目標、管理員）都需驗證管理員身份。
-    - 說明如何保護敏感資訊（如 API 金鑰、session 檔案），並建議使用 `.env` 管理環境變數。
+*   在專案根目錄下，您會找到一個名為 `content_databases/` 的資料夾。
+*   **每個子資料夾代表一個廣播活動 (Campaign)**。例如：`campaign_A`、`campaign_B`。
+*   在每個活動資料夾內：
+    *   必須包含一個 `message.txt` 檔案，用於存放廣播的文字內容。
+    *   可以選擇性地包含一個媒體檔案（圖片、影片或 GIF），例如 `image.jpg`、`video.mp4`、`animation.gif`。機器人會自動偵測並發送。
 
-14. 自動化與擴充性設計
-    - 討論如何讓新群組/頻道自動偵測、標記與管理，減少人工操作。
-    - 提供未來擴充建議，例如：支援多語系、定時自動備份、Web 管理介面等。
+    範例結構：
+    ```
+    rg_user_bot/
+    ├── content_databases/
+    │   ├── campaign_A/          # 廣播活動 A
+    │   │   ├── message.txt      # 活動 A 的文字內容
+    │   │   └── image.jpg        # 活動 A 的圖片 (可選)
+    │   └── campaign_B/          # 廣播活動 B
+    │       ├── message.txt      # 活動 B 的文字內容
+    │       └── video.mp4        # 活動 B 的影片 (可選)
+    ```
 
-15. 常見問題與 FAQ 編寫
-    - 協助整理新手常見問題（如登入失敗、訊息未送達、指令無回應等），並提供解決方法，方便用戶自助排查。
+### 6. 首次啟動與登入
 
-16. 專案維護與升級建議
-    - 建議定期更新依賴套件、備份設定與資料檔案。
-    - 說明如何安全升級 Telegram API 或相關函式庫，避免因版本不符導致專案故障。
+1.  開啟終端機，進入專案根目錄。
+2.  執行主程式：
+    ```bash
+    python main.py
+    ```
+3.  **首次運行時**，機器人會提示您輸入 Telegram 驗證碼。請檢查您**已登入的 Telegram App**（通常是手機或電腦版）中，來自 Telegram 官方的訊息，驗證碼會在那裡。
+4.  如果您的帳號設定了兩步驟驗證（2FA），機器人也會提示您輸入密碼。
+5.  成功登入後，機器人會顯示「✅ Telegram 客戶端已連接」和「✅ 機器人已準備就緒，正在等待指令...」。
 
-17. 社群與協作
-    - 建議建立 GitHub Issue/PR 流程，方便多人協作與追蹤問題。
-    - 鼓勵撰寫貢獻指南（CONTRIBUTING.md），歡迎其他開發者參與專案。
+### 7. 背景運行 (推薦)
 
----
+為了讓機器人持續運行並能同時操作終端機，您可以將其在背景啟動：
 
-總結
-====================
-本次對話不僅協助你解決了 Telegram 廣播機器人的技術問題，還涵蓋了專案架構優化、文件撰寫、權限管理、安全性、維護建議與新手教學等多面向內容。這些紀錄將有助於未來專案維護、團隊協作與新手快速上手，讓你的專案更穩定、易用且具備擴充性。
+```bash
+# Windows (PowerShell)
+python main.py &
 
-如需進一步細節、程式碼片段或文件範例，隨時告知！ 
+# Linux/macOS
+python3 main.py &
+```
+
+### 8. 開始使用
+
+機器人啟動後，您可以在 `.env` 中設定的 `CONTROL_GROUP` 群組中，使用以下指令來操作機器人：
+
+*   `/help`：查看所有可用指令。
+*   `/campaigns`：列出所有可用的廣播活動名稱。
+*   `/add_schedule HH:MM <活動名稱>`：設定自動廣播排程。
+*   `/test <活動名稱>`：手動測試廣播。
+
+祝您使用愉快！

@@ -1,18 +1,18 @@
 {
   "target_groups": [
     {
-      "id": -1002335227988,
-      "title": "飛機機器人",
-      "type": "channel"
-    },
-    {
-      "id": -4863847631,
-      "title": "RG自動推播 001",
-      "type": "channel"
-    },
-    {
       "id": 2512140773,
       "title": "RG主控制 自動推播",
+      "type": "group"
+    },
+    {
+      "id": 2813335193,
+      "title": "廣播主控制群組",
+      "type": "group"
+    },
+    {
+      "id": 4863847631,
+      "title": "RG自動推播 001",
       "type": "group"
     },
     {
@@ -21,22 +21,17 @@
       "type": "group"
     },
     {
-      "id": 2863381572,
-      "title": "RG",
+      "id": 2335227988,
+      "title": "飛機機器人",
+      "type": "group"
+    },
+    {
+      "id": 2578959090,
+      "title": "KING 廣播控制群",
       "type": "group"
     }
   ],
-  "broadcast_times": [
-    "13:10",
-    "13:15",
-    "13:20",
-    "13:25",
-    "13:50",
-    "13:55",
-    "14:40",
-    "14:46",
-    "14:50"
-  ],
+  "broadcast_times": [],
   "enabled": true,
-  "last_updated": "2025-06-24T16:44:41.217171"
+  "last_updated": "2025-06-27T20:14:32.464674"
 }

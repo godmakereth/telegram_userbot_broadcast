@@ -24,7 +24,7 @@ class Config:
         self.control_group = int(os.getenv('CONTROL_GROUP', '0'))
         
         # 廣播參數設定
-        self.broadcast_delay = int(os.getenv('BROADCAST_DELAY', '2'))
+        self.broadcast_delay = int(os.getenv('BROADCAST_DELAY', '5'))
         self.max_retries = int(os.getenv('MAX_RETRIES', '3'))
         
         # --- 新增: 時區設定 ---
@@ -52,7 +52,14 @@ class Config:
             else:
                 self.broadcast_times = []
             
-        except (FileNotFoundError, json.JSONDecodeError):
+        except FileNotFoundError:
+            print("⚠️ settings.json 未找到，將使用預設設定。")
+            self.target_groups = []
+            self.broadcast_times = []
+            self.enabled = False
+            self.save_settings()
+        except json.JSONDecodeError:
+            print("❌ settings.json 格式錯誤，將使用預設設定並覆蓋。")
             self.target_groups = []
             self.broadcast_times = []
             self.enabled = False
@@ -73,13 +80,19 @@ class Config:
 
     def load_admins(self):
         """從 admins.json 載入管理員列表。"""
-        if os.path.exists(self.ADMINS_FILE):
-            try:
-                with open(self.ADMINS_FILE, 'r', encoding='utf-8') as f:
-                    self.admins = json.load(f)
-            except (json.JSONDecodeError, IOError):
-                self.admins = []
-        else:
+        try:
+            with open(self.ADMINS_FILE, 'r', encoding='utf-8') as f:
+                self.admins = json.load(f)
+        except FileNotFoundError:
+            print("⚠️ admins.json 未找到，將使用預設管理員設定。")
+            self.admins = []
+            self.save_admins()
+        except json.JSONDecodeError:
+            print("❌ admins.json 格式錯誤，將使用預設管理員設定並覆蓋。")
+            self.admins = []
+            self.save_admins()
+        except IOError as e:
+            print(f"❌ 讀取 admins.json 時發生 IO 錯誤: {e}，將使用預設管理員設定。")
             self.admins = []
             self.save_admins()
 
@@ -111,18 +124,23 @@ class Config:
         try:
             with open('broadcast_config.json', 'r', encoding='utf-8') as f:
                 config = json.load(f)
-            self.default_message_file = config.get('default_message_file', 'message.txt')
+            self.schedules = config.get('schedules', [])
             self.total_restarts = config.get('total_restarts', 0)
-        except (FileNotFoundError, json.JSONDecodeError):
-            self.default_message_file = 'message.txt'
+        except FileNotFoundError:
+            print("⚠️ broadcast_config.json 未找到，將使用預設設定。")
+            self.schedules = []
+            self.total_restarts = 0
+            self.save_broadcast_config(is_startup=False)
+        except json.JSONDecodeError:
+            print("❌ broadcast_config.json 格式錯誤，將使用預設設定並覆蓋。")
+            self.schedules = []
             self.total_restarts = 0
             self.save_broadcast_config(is_startup=False)
 
     def save_broadcast_config(self, is_startup=True):
         if is_startup: self.total_restarts += 1
         config = {
-            'schedules': [], 
-            'default_message_file': self.default_message_file,
+            'schedules': self.schedules, 
             'last_startup': datetime.now().isoformat(), 
             'total_restarts': self.total_restarts
         }

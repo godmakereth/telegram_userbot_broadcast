@@ -1,6 +1,62 @@
 {
-  "schedules": [],
-  "default_message_file": "message 3.txt",
-  "last_startup": "2025-06-24T16:44:10.659194",
-  "total_restarts": 40
+  "schedules": [
+    {
+      "time": "20:05",
+      "campaign": "campaign_A"
+    },
+    {
+      "time": "20:10",
+      "campaign": "campaign_B"
+    },
+    {
+      "time": "20:15",
+      "campaign": "campaign_C"
+    },
+    {
+      "time": "20:20",
+      "campaign": "campaign_A"
+    },
+    {
+      "time": "20:25",
+      "campaign": "campaign_B"
+    },
+    {
+      "time": "20:26",
+      "campaign": "campaign_A"
+    },
+    {
+      "time": "20:27",
+      "campaign": "campaign_A"
+    },
+    {
+      "time": "20:30",
+      "campaign": "campaign_C"
+    },
+    {
+      "time": "20:35",
+      "campaign": "campaign_C"
+    },
+    {
+      "time": "20:40",
+      "campaign": "campaign_A"
+    },
+    {
+      "time": "20:45",
+      "campaign": "campaign_B"
+    },
+    {
+      "time": "20:50",
+      "campaign": "campaign_A"
+    },
+    {
+      "time": "20:55",
+      "campaign": "campaign_C"
+    },
+    {
+      "time": "21:00",
+      "campaign": "campaign_B"
+    }
+  ],
+  "last_startup": "2025-06-27T22:30:03.126424",
+  "total_restarts": 4
 }

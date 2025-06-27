@@ -3,40 +3,69 @@ import glob
 
 class MessageManager:
     """
-    管理廣播訊息檔案的相關操作，如載入、列出檔案等。
+    管理廣播活動內容的相關操作，包括列出活動、載入活動內容（文字、圖片、影片、GIF）。
     """
-    def load_message(self, message_file: str) -> str:
+    CONTENT_DB_PATH = "content_databases"
+
+    def list_campaigns(self) -> list[str]:
         """
-        從指定檔案載入廣播訊息。
-        如果檔案不存在，會回傳錯誤訊息，或建立預設檔案。
+        列出 content_databases 目錄下所有可用的廣播活動（子資料夾名稱）。
         """
-        try:
-            with open(message_file, 'r', encoding='utf-8') as f:
-                content = f.read().strip()
-                print(f"📄 已載入文案檔案: {message_file} ({len(content)} 字符)")
-                return content
-        except FileNotFoundError:
-            # 如果是預設的 message.txt 不存在，則自動建立一個
-            if message_file == 'message.txt':
-                default_message = """🔍 **最新求職機會** 🔍
+        if not os.path.isdir(self.CONTENT_DB_PATH):
+            print(f"⚠️ 找不到內容資料庫目錄：{self.CONTENT_DB_PATH}")
+            return []
+        
+        campaigns = [d for d in os.listdir(self.CONTENT_DB_PATH) if os.path.isdir(os.path.join(self.CONTENT_DB_PATH, d))]
+        print(f"📂 已找到 {len(campaigns)} 個廣播活動：{', '.join(campaigns)}")
+        return campaigns
 
-📍 **職位:** 請在 message.txt 中設定您的廣播內容
-💰 **薪資:** 面議
-🏢 **公司:** 您的公司名稱
-📧 **聯絡:** 您的聯絡方式
+    def load_campaign_content(self, campaign_name: str) -> dict:
+        """
+        從指定的廣播活動資料夾載入內容，包括文字、圖片、影片和GIF。
+        """
+        campaign_path = os.path.join(self.CONTENT_DB_PATH, campaign_name)
+        content = {
+            "text": "",
+            "photo": None,
+            "video": None,
+            "gif": None
+        }
 
-歡迎有興趣的朋友私訊詢問詳情！
+        if not os.path.isdir(campaign_path):
+            print(f"❌ 找不到指定的廣播活動資料夾：{campaign_path}")
+            return content
 
-#求職 #工作機會"""
-                with open('message.txt', 'w', encoding='utf-8') as f:
-                    f.write(default_message)
-                print(f"📄 找不到 message.txt，已建立預設檔案。")
-                return default_message
-            else:
-                error_msg = f"❌ 找不到指定的文案檔案：{message_file}"
-                print(error_msg)
-                return error_msg
+        # 載入文字內容 (message.txt)
+        message_file_path = os.path.join(campaign_path, "message.txt")
+        if os.path.exists(message_file_path):
+            try:
+                with open(message_file_path, 'r', encoding='utf-8') as f:
+                    content["text"] = f.read().strip()
+                    print(f"📄 已載入活動文案: {message_file_path} ({len(content['text'])} 字符)")
+            except Exception as e:
+                print(f"❌ 載入活動文案檔案失敗: {message_file_path} - {e}")
 
-    def list_message_files(self) -> list:
-        """列出當前目錄下所有符合 message*.txt 格式的檔案。"""
-        return glob.glob('message*.txt')
+        # 搜尋圖片、影片和GIF
+        # 優先順序：圖片 -> 影片 -> GIF
+        for ext in ["jpg", "jpeg", "png"]:
+            files = glob.glob(os.path.join(campaign_path, f"*.{ext}"))
+            if files:
+                content["photo"] = files[0] # 只取第一個找到的圖片
+                print(f"🖼️ 已找到圖片: {content['photo']}")
+                break
+
+        if not content["photo"]:
+            for ext in ["mp4", "mov", "avi"]:
+                files = glob.glob(os.path.join(campaign_path, f"*.{ext}"))
+                if files:
+                    content["video"] = files[0] # 只取第一個找到的影片
+                    print(f"🎬 已找到影片: {content['video']}")
+                    break
+
+        if not content["photo"] and not content["video"]:
+            files = glob.glob(os.path.join(campaign_path, "*.gif"))
+            if files:
+                content["gif"] = files[0] # 只取第一個找到的GIF
+                print(f"✨ 已找到GIF: {content['gif']}")
+
+        return content

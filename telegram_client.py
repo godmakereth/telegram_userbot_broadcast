@@ -1,4 +1,5 @@
-from telethon import TelegramClient
+import getpass
+from telethon import TelegramClient, errors
 
 class TelegramClientManager:
     """
@@ -18,10 +19,15 @@ class TelegramClientManager:
         會根據設定處理 2FA 密碼。
         """
         print("⏳ 正在連接 Telegram...")
-        if self.config.password:
-            await self.client.start(phone=self.config.phone, password=self.config.password)
-        else:
-            await self.client.start(phone=self.config.phone)
+        await self.client.connect()
+
+        if not await self.client.is_user_authorized():
+            await self.client.send_code_request(self.config.phone)
+            try:
+                await self.client.sign_in(self.config.phone, input('請輸入 Telegram 驗證碼: '))
+            except errors.SessionPasswordNeededError:
+                password = self.config.password or getpass.getpass('請輸入您的兩步驟驗證密碼: ')
+                await self.client.sign_in(password=password)
         
         me = await self.client.get_me()
         print(f"✅ Telegram 客戶端已連接")

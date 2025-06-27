@@ -13,11 +13,12 @@ userbot.session
 userbot.session-journal
 
 # 備份檔案
-backup/*.bak
+backup/
+*.bak
 
 # 系統檔案
 .DS_Store
 Thumbs.db
 
-# 舊檔案排除
-command_handler 舊 .py 
+# Log files
+bot.log

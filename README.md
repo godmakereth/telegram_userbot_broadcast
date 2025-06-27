@@ -6,9 +6,9 @@
 
 ## 主要功能
 - 支援多群組/頻道自動廣播
-- 多時段定時排程
+- **多任務排程**：為不同時間點設定不同的廣播活動
+- **廣播活動管理**：每個活動可包含文字、圖片、影片、GIF 等多媒體內容
 - 管理員權限控管
-- 文案多檔管理、預覽、測試
 - 廣播歷史查詢、狀態查詢
 - 本地自動備份所有設定檔
 - 完整指令操作說明，適合新手
@@ -37,14 +37,14 @@
 - `/list`：查看所有廣播群組
 - `/remove <編號>`：移除指定群組
 - `/my_groups`：快速查看所在群組
-- `/time HH:MM`：新增每日廣播時間
-- `/time remove HH:MM`：移除指定時間
-- `/time clear`：清除所有時間
+- `/campaigns`：列出所有可用的廣播活動
+- `/preview <活動名稱>`：預覽指定活動的內容
+- `/test <活動名稱>`：手動測試廣播指定活動
+- `/add_schedule HH:MM <活動名稱>`：新增一個排程
+- `/remove_schedule HH:MM <活動名稱>`：移除指定排程
+- `/list_schedules`：查看所有已設定的排程
 - `/enable` / `/disable`：啟用/停用排程
-- `/files`：列出所有文案檔
-- `/preview [檔名]`：預覽文案內容
-- `/test [檔名]`：測試廣播
-- `/status`：查看機器人狀態
+- `/schedule`：查看排程狀態
 - `/history`：查詢廣播歷史
 - `/help`：顯示所有指令說明
 
@@ -71,19 +71,25 @@
 ## 檔案結構說明
 
 ```
-rg_thelegram_user_bot/
+rg_user_bot/
 ├── main.py                  # 主程式
 ├── config.py                # 設定管理
 ├── telegram_client.py       # Telegram 連線
-├── message_manager.py       # 文案管理
+├── message_manager.py       # 廣播活動內容管理
 ├── broadcast_manager.py     # 廣播發送
 ├── scheduler.py             # 排程管理
 ├── command_handler.py       # 指令處理
 ├── requirements.txt         # 依賴套件
-├── settings.json            # 目標/排程設定
+├── settings.json            # 目標群組設定
 ├── admins.json              # 管理員設定
-├── broadcast_config.json    # 廣播設定
+├── broadcast_config.json    # 廣播排程與活動設定
 ├── broadcast_history.json   # 廣播歷史
-├── message 1.txt            # 文案檔案
+├── content_databases/       # 廣播活動內容資料庫
+│   ├── campaign_A/          # 範例活動A
+│   │   ├── message.txt      # 活動文案
+│   │   └── image.jpg        # 活動圖片 (可選)
+│   └── campaign_B/          # 範例活動B
+│       ├── message.txt      # 活動文案
+│       └── video.mp4        # 活動影片 (可選)
 ├── ...（其他檔案）
 ``` 

@@ -5,15 +5,17 @@ import time
 from datetime import datetime
 import pytz
 import logging
+import os # Import os module
 
 class Scheduler:
     """
     管理定時廣播排程，支援多個廣播時間點與時區。
     """
-    def __init__(self, config, broadcast_manager, loop):
+    def __init__(self, config, broadcast_manager, loop, message_manager): # Add message_manager
         self.config = config
         self.broadcast_manager = broadcast_manager
         self.loop = loop
+        self.message_manager = message_manager # Store message_manager
         try:
             self.tz = pytz.timezone(self.config.timezone)
         except pytz.UnknownTimeZoneError:
@@ -23,31 +25,39 @@ class Scheduler:
     def setup_schedule(self):
         """根據設定中的時間列表，建立或清除所有排程。"""
         schedule.clear()
-        if self.config.enabled and self.config.broadcast_times:
-            print(f"📅 正在設定 {len(self.config.broadcast_times)} 個每日自動廣播排程 (時區: {self.config.timezone})...")
-            message_file = self.config.default_message_file
+        if self.config.enabled and self.config.schedules: 
+            print(f"📅 正在設定 {len(self.config.schedules)} 個每日自動廣播排程 (時區: {self.config.timezone})...")
             
-            for broadcast_time in self.config.broadcast_times:
+            for task in self.config.schedules: 
+                broadcast_time = task.get("time")
+                campaign_name = task.get("campaign")
+                
+                if not broadcast_time or not campaign_name:
+                    print(f"  -> ❌ 無效的排程設定: {task} (缺少 'time' 或 'campaign')")
+                    continue
+
                 try:
                     # 使用指定的時區來設定排程
                     schedule.every().day.at(broadcast_time, self.config.timezone).do(
-                        self.run_scheduled_broadcast, message_file=message_file
+                        self.run_scheduled_broadcast, campaign_name=campaign_name 
                     )
-                    print(f"  -> 已設定排程: {broadcast_time}")
+                    print(f"  -> 已設定排程: {broadcast_time} (活動: {campaign_name})")
                 except Exception as e:
                     print(f"  -> ❌ 設定排程 {broadcast_time} 失敗: {e}")
         else:
             print("⏸️ 自動廣播未啟用或未設定時間，已清除所有排程。")
 
-    def run_scheduled_broadcast(self, message_file: str):
+    def run_scheduled_broadcast(self, campaign_name: str): 
         """將排定的廣播任務安全地提交到主事件循環中執行。"""
         print(f"[DEBUG] enabled={self.config.enabled}, loop_running={self.loop.is_running() if self.loop else None}")
         # 增加診斷日誌，確認排程已被觸發
         print(f"⏰ 排程時間已到 (時間: {datetime.now(self.tz).strftime('%H:%M:%S')})，準備執行廣播任務...")
         
         if self.config.enabled and self.loop and self.loop.is_running():
+            # Load content from the specified campaign
+            content = self.message_manager.load_campaign_content(campaign_name)
             asyncio.run_coroutine_threadsafe(
-                self.broadcast_manager.send_broadcast(message_file), self.loop
+                self.broadcast_manager.send_campaign_broadcast(content, campaign_name), self.loop 
             )
         else:
             print("⚠️ 廣播任務被取消，原因：自動廣播未啟用或事件循環未運行。")

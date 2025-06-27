@@ -1,67 +1,65 @@
 Telegram 廣播機器人操作說明
 ============================
 
-一、安裝與啟動
-----------------------------
-1. 下載或 clone 專案：
-   git clone https://github.com/godmakereth/rg_thelegram_user_bot
-2. 進入專案資料夾，安裝依賴：
-   pip install -r requirements.txt
-3. 複製 .env.example 為 .env，填入 Telegram API 資訊。
-4. 執行 start.bat 或 python main.py 啟動機器人。
-5. 首次啟動會要求登入 Telegram 帳號，依指示完成。
-
 二、常用指令
 ----------------------------
-- /list_group
+- `/list`
   顯示所有已加入的群組/頻道，並標記哪些是廣播目標。
-- /add <群組ID>
-  新增群組/頻道為廣播目標，群組ID可由 /list_group 查詢。
-- /remove <群組ID>
+- `/add <群組ID>`
+  新增群組/頻道為廣播目標，群組ID可由 `/list` 查詢。
+- `/remove <群組ID>`
   移除廣播目標。
-- /list_admins
+- `/list_admins`
   顯示管理員名單。
-- /add_admin <ID/@用戶名>
+- `/add_admin <ID/@用戶名>`
   新增管理員。
-- /sync_admins
-  同步管理員名單（從設定檔）。
-- /broadcast <訊息>
-  立即廣播訊息至所有廣播目標。
-- /schedule <時間> <訊息>
-  設定定時廣播（格式如 2024-06-01 12:00 測試訊息）。
+- `/sync_admins`
+  同步管理員名單（從控制群組）。
+- `/campaigns`
+  列出 `content_databases/` 目錄下所有可用的廣播活動（資料夾名稱）。
+- `/preview <活動名稱>`
+  預覽指定廣播活動的內容，包括文字和媒體（圖片、影片、GIF）。
+  範例：`/preview campaign_A`
+- `/test <活動名稱>`
+  立即測試廣播指定活動的內容到所有目標群組。
+  範例：`/test campaign_B`
+- `/add_schedule HH:MM <活動名稱>`
+  新增一個每日廣播排程。指定時間（24小時制）和要執行的廣播活動名稱。
+  範例：`/add_schedule 10:30 campaign_A`
+- `/remove_schedule HH:MM <活動名稱>`
+  移除指定的廣播排程。
+  範例：`/remove_schedule 10:30 campaign_A`
+- `/list_schedules`
+  列出所有已設定的廣播排程，包含時間和對應的活動名稱。
+- `/schedule`
+  查看排程系統的整體狀態、所有排程與下一個即將執行的廣播倒數。
+- `/enable`
+  啟用所有定時廣播排程。
+- `/disable`
+  停用所有定時廣播排程。
+- `/history`
+  查詢廣播歷史。
+- `/status`
+  查看機器人狀態。
+- `/help`
+  顯示所有指令說明。
 
 三、管理員操作
 ----------------------------
 - 只有管理員可執行新增/移除廣播目標、管理員、排程等敏感操作。
-- 管理員名單可於 admins.json 或用指令管理。
+- 管理員名單可於 `admins.json` 或用指令管理。
 
 四、排程與廣播設定
 ----------------------------
-- 排程設定儲存在 broadcast_config.json。
+- 排程設定儲存在 `broadcast_config.json`。
 - 可設定多組定時廣播，支援重複排程。
-- 廣播歷史會記錄於 broadcast_history.json，方便查詢。
-
-五、常見問題
-----------------------------
-1. 啟動時無法登入？
-   → 請確認 .env 設定正確，API ID/Hash 無誤。
-2. 指令無回應？
-   → 請確認帳號是否為管理員，或查看終端機 log 是否有錯誤訊息。
-3. 廣播未送達？
-   → 檢查群組/頻道是否已加入，且在廣播目標名單內。
-4. 如何新增新帳號？
-   → 複製專案到新資料夾，重新登入 Telegram 帳號即可。
+- 廣播歷史會記錄於 `broadcast_history.json`，方便查詢。
 
 六、檔案說明
 ----------------------------
-- settings.json：一般設定檔
-- admins.json：管理員名單
-- broadcast_config.json：廣播排程設定
-- broadcast_history.json：廣播歷史紀錄
+- `settings.json`：目標群組設定
+- `admins.json`：管理員名單
+- `broadcast_config.json`：廣播排程與活動設定
+- `broadcast_history.json`：廣播歷史紀錄
 
-七、進階建議
-----------------------------
-- 建議定期備份 .json 設定檔
-- 如需多語系、Web 管理等功能，可依需求擴充
-
-如有其他問題，請參考 README.md 或聯絡專案維護者。 
+如有其他問題，請參考 `README.md` 或輸入 `/help` 查詢。
